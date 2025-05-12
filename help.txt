@@ -1,0 +1,9 @@
+sqlite3 ./user_management.db
+.headers on
+SELECT * FROM users;
+
+.exit
+
+docker compose up
+
+docker compose exec api pytest
