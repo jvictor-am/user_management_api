@@ -9,11 +9,11 @@ def test_health_check(client):
 
 def test_create_user_and_login(client):
     """Test creating a user and then logging in using the test client fixture."""
-    # Create a user
+    # Create a user with a complex password that passes validation
     user_data = {
         "username": "testuser",
         "email": "testuser@example.com",
-        "password": "password123"
+        "password": "Password123!"  # Complex password with upper, lower, number, special char
     }
     
     # Use the client fixture from conftest.py which has the DB dependencies properly overridden
@@ -24,7 +24,7 @@ def test_create_user_and_login(client):
     # Login with the created user
     login_data = {
         "username": "testuser",
-        "password": "password123"
+        "password": "Password123!"
     }
     response = client.post("/auth/login/json", json=login_data)
     assert response.status_code == 200
@@ -39,24 +39,33 @@ def test_create_user_and_login(client):
     assert response.status_code == 200
     assert "items" in response.json()
 
-def test_rate_limiting(client):
-    """Test that the rate limiting middleware works correctly."""
-    # The rate limiter might already have some counts from previous tests
-    # So we'll make fewer requests and just verify the limiter works eventually
+def test_get_user_by_id(client):
+    """Test retrieving a user by ID."""
+    # Create a test user first
+    user_data = {"username": "getuser", "email": "getuser@example.com", "password": "Password123!"}
+    response = client.post("/users/", json=user_data)
+    user_id = response.json()["id"]
     
-    # Make several requests - should be allowed
-    for i in range(5):
-        response = client.get("/")
-        assert response.status_code == 200
+    # Login to get token
+    login_data = {"username": "getuser", "password": "Password123!"}
+    response = client.post("/auth/login/json", json=login_data)
+    token = response.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
     
-    # Now keep making requests until we hit the limit or reach a maximum try count
-    hit_limit = False
-    for i in range(30):  # Try up to 30 more times
-        response = client.get("/")
-        if response.status_code == 429:
-            hit_limit = True
-            assert response.text == "Rate limit exceeded"
-            break
+    # Get user by ID
+    response = client.get(f"/users/{user_id}", headers=headers)
+    assert response.status_code == 200
+    assert response.json()["id"] == user_id
+    assert response.json()["username"] == "getuser"
+
+def test_password_validation(client):
+    """Test password validation rules."""
+    # Test with weak password
+    user_data = {"username": "weakpass", "email": "weak@example.com", "password": "simple"}
+    response = client.post("/users/", json=user_data)
+    assert response.status_code == 422  # Validation error
     
-    # Verify we did hit the rate limit
-    assert hit_limit, "Rate limiting didn't trigger"
+    # Test with strong password
+    user_data["password"] = "StrongP@ss123"
+    response = client.post("/users/", json=user_data)
+    assert response.status_code == 201

@@ -1,6 +1,4 @@
 from datetime import datetime
-from unittest.mock import MagicMock
-
 import pytest
 
 from src.domain.entities.user import User
