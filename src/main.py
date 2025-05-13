@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.infrastructure.api.routes import auth_routes, user_routes
-from src.infrastructure.database.database import Base, engine
+from src.infrastructure.api.routes import auth_routes, user_routes, health_routes
+from src.infrastructure.api.middlewares import RateLimitMiddleware
+from src.infrastructure.database.database import create_tables
 from src.settings import Settings
 
 # Create database tables
-Base.metadata.create_all(bind=engine)
+create_tables()
 
 settings = Settings()
 app = FastAPI(
@@ -24,9 +25,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Add rate limiting
+app.add_middleware(
+    RateLimitMiddleware,
+    requests_limit=30,  # 30 requests
+    window_size=60  # per minute
+)
+
 # Include routers
 app.include_router(auth_routes.router)
 app.include_router(user_routes.router)
+app.include_router(health_routes.router)
 
 
 @app.get("/", tags=["health"])
