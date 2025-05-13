@@ -97,6 +97,28 @@ After starting the application, you can access the API documentation at:
 - `PUT /users/{user_id}` - Update a user
 - `DELETE /users/{user_id}` - Delete a user
 
+## Security Features
+
+The API includes several security enhancements:
+
+### Authentication Security
+- **Argon2id Password Hashing**: Industry-leading password hashing with tunable memory, iterations and parallelism
+- **Authentication Logging**: All login attempts (successful and failed) are tracked with timestamps and IP addresses
+- **Rate Limiting**: Protects against brute-force attacks by limiting request frequency
+- **JWT Token Security**:
+  - UUID-based token identifiers to prevent token reuse
+  - Timezone-aware expiration handling
+  - HMAC-SHA256 signature algorithm
+- **BCrypt Fallback**: Compatible with older password hashes while upgrading to newer algorithms
+- **Secure Authentication Routes**: 
+  - Form-based and JSON-based authentication endpoints
+  - Protected endpoints using OAuth2 bearer token scheme
+
+### API Security
+- **CORS Protection**: Configurable Cross-Origin Resource Sharing
+- **SQLite Security**: Protections against SQL injection via SQLAlchemy ORM
+- **Input Validation**: Comprehensive validation on all input fields using Pydantic
+
 ## Using the Postman Collection
 
 The project includes a Postman collection for easy API testing:
@@ -196,15 +218,6 @@ SELECT * FROM users;
 ```
 
 ## Test Coverage Reports
-
-First, install the pytest-cov plugin in your Docker container:
-
-```bash
-# Install the pytest-cov plugin
-docker compose exec api pip install pytest-cov
-```
-
-Then you can generate and view test coverage reports:
 
 ### Terminal Report
 
