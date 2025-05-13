@@ -97,16 +97,100 @@ After starting the application, you can access the API documentation at:
 - `PUT /users/{user_id}` - Update a user
 - `DELETE /users/{user_id}` - Delete a user
 
+## Using the Postman Collection
+
+The project includes a Postman collection for easy API testing:
+
+### Importing the Collection
+
+1. Open Postman
+2. Click "Import" in the top left corner
+3. Select the file: `docs/postman_collection.json`
+4. Click "Import"
+
+### Setting Up the Environment
+
+1. Click "Environments" in the left sidebar
+2. Click "Create Environment" and name it "User Management API"
+3. Add two variables:
+   - `baseUrl`: Set value to `http://localhost:8000`
+   - `token`: Leave empty (will be filled automatically)
+4. Click "Save"
+5. Select this environment from the dropdown in the top-right corner
+
+### Testing the API
+
+1. **Create a user**:
+   - Use the "Create User" request
+   - Provides username, email, and password in the request body
+   
+2. **Login**:
+   - Use either "Login" or "Login with JSON" request
+   - Provide your credentials
+   - The authentication token will be automatically saved to the environment
+
+3. **Access protected endpoints**:
+   - All requests will automatically use the saved token
+   - Try "List Users" to verify your authentication is working
+   - Use "Get User by ID" with the appropriate user ID
+   - Experiment with updating and deleting users
+
+The collection automatically handles authentication tokens, making it easy to test all API endpoints.
+
 ## Running Tests
 
 ### With Docker
 
 ```bash
-docker-compose exec api pytest
+# Run all tests - Note: Uses a separate in-memory database
+docker compose exec api pytest
+
+# Run specific test file
+docker compose exec api pytest tests/test_user_service.py
+
+# Run tests with coverage report
+docker compose exec api pytest --cov=src tests/
 ```
 
 ### Without Docker
 
 ```bash
+# Make sure you're in the project root directory
+export PYTHONPATH=$PYTHONPATH:$(pwd)
 pytest
+```
+
+### Testing Note
+The test suite uses an isolated in-memory SQLite database that's separate from 
+your production database. Each test function gets its own database instance that
+is completely destroyed after the test runs. No test data should ever appear in
+your API's production database.
+
+## Database Access
+
+### Accessing SQLite CLI in Docker Container
+
+To access and query the database directly:
+
+```bash
+docker compose exec api bash
+
+# Check if SQLite is installed
+which sqlite3
+
+# If SQLite is not installed, install it
+if [ ! -f /usr/bin/sqlite3 ]; then
+    apt-get update
+    apt-get install -y sqlite3
+fi
+
+# Inside the container, access the SQLite database
+sqlite3 /app/data/user_management.db
+
+# SQLite commands:
+.headers on
+.tables
+SELECT * FROM users;
+.schema users
+.quit
 ```
