@@ -224,3 +224,21 @@ docker compose exec api pytest --cov=src --cov-report=html tests/
 docker cp user-management-api:/app/htmlcov ./htmlcov
 # Then open htmlcov/index.html in your browser
 ```
+
+---
+
+## Images
+
+<h3 align="center">
+  
+<img src=".github/imgs/swagger_browser.png" width="700"  alt="swagger_browser">
+
+<details><summary><b>More Images</b></summary>
+  
+<img src=".github/imgs/redoc_browser.png" width="700"  alt="redoc_browser">
+<img src=".github/imgs/tests_coverage_terminal.png" width="700"  alt="tests_coverage_terminal">
+<img src=".github/imgs/postman_collection.png" width="700"  alt="postman_collection">
+<img src=".github/imgs/sqlite_cli_docker_terminal.png" width="700"  alt="sqlite_cli_docker_terminal">
+
+</details>
+</h3>
