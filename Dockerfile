@@ -9,6 +9,8 @@ RUN pip install email-validator
 
 # Copy project files
 COPY . .
+COPY docker-entrypoint.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Expose the port the app will run on
 EXPOSE 8000
