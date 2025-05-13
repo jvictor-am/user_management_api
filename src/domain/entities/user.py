@@ -14,6 +14,8 @@ class User:
         is_active: bool = True,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
+        mfa_enabled: bool = False,
+        mfa_secret: Optional[str] = None,
     ):
         self.id = id
         self.username = username
@@ -22,3 +24,5 @@ class User:
         self.is_active = is_active
         self.created_at = created_at or datetime.now(timezone.utc)
         self.updated_at = updated_at or datetime.now(timezone.utc)
+        self.mfa_enabled = mfa_enabled
+        self.mfa_secret = mfa_secret

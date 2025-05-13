@@ -12,6 +12,7 @@ from src.domain.services.auth_service import AuthService
 from src.domain.services.user_service import UserService
 from src.infrastructure.database.database import get_db
 from src.infrastructure.repositories.sqlite_user_repository import SQLiteUserRepository
+from src.infrastructure.repositories.sqlite_auth_log_repository import SQLiteAuthLogRepository
 from src.settings import Settings
 
 settings = Settings()
@@ -22,11 +23,19 @@ def get_user_repository(db: Session = Depends(get_db)) -> UserRepository:
     return SQLiteUserRepository(db)
 
 
-def get_auth_service() -> AuthService:
+def get_auth_log_repository(db: Session = Depends(get_db)) -> SQLiteAuthLogRepository:
+    """Return an AuthLogRepository implementation."""
+    return SQLiteAuthLogRepository(db)
+
+
+def get_auth_service(auth_log_repository: SQLiteAuthLogRepository = Depends(get_auth_log_repository)) -> AuthService:
+    """Return an AuthService instance."""
+    settings = Settings()
     return AuthService(
         secret_key=settings.secret_key,
         algorithm=settings.algorithm,
         access_token_expire_minutes=settings.access_token_expire_minutes,
+        auth_log_repository=auth_log_repository
     )
 
 
