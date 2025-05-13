@@ -60,3 +60,15 @@ class UserService:
     def list_users(self, skip: int = 0, limit: int = 100) -> Tuple[List[User], int]:
         """List users with pagination."""
         return self.user_repository.list_users(skip, limit)
+
+    def check_account_status(self, username: str) -> Tuple[bool, Optional[str]]:
+        """Check if account is locked due to too many failed attempts."""
+        user = self.user_repository.get_by_username(username)
+        if not user:
+            return True, None  # Don't reveal that user doesn't exist
+            
+        # Check for lockout status (implementation would depend on your data model)
+        if self._is_account_locked(user.id):
+            return False, "Account is temporarily locked due to too many failed login attempts"
+            
+        return True, None
