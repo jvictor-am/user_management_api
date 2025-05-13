@@ -194,3 +194,33 @@ SELECT * FROM users;
 .schema users
 .quit
 ```
+
+## Test Coverage Reports
+
+First, install the pytest-cov plugin in your Docker container:
+
+```bash
+# Install the pytest-cov plugin
+docker compose exec api pip install pytest-cov
+```
+
+Then you can generate and view test coverage reports:
+
+### Terminal Report
+
+```bash
+# Generate detailed coverage report in terminal
+docker compose exec api pytest --cov=src --cov-report=term-missing tests/
+```
+
+### HTML Report
+
+```bash
+# Generate HTML coverage report
+docker compose exec api pytest --cov=src --cov-report=html tests/
+
+# If running locally, open the report
+# For Docker, you need to copy it out of the container first
+docker cp user-management-api:/app/htmlcov ./htmlcov
+# Then open htmlcov/index.html in your browser
+```
