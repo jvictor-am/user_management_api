@@ -18,6 +18,9 @@ from src.infrastructure.api.dependencies import get_db, get_user_repository
 from src.infrastructure.api.dependencies import get_auth_use_case, get_user_use_case
 from src.settings import Settings
 
+# Set testing environment
+os.environ["TESTING"] = "1"
+
 # Create a completely separate in-memory database for testing
 # Use StaticPool to ensure the same connection is used throughout tests
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"
